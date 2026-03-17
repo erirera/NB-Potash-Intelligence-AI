@@ -139,7 +139,22 @@ fetch('https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/p
       let districtPoly = box;
 
       try {
-        const intersection = turf.intersect(turf.featureCollection([nb, box]));
+        // turf.intersect (v6) requires two Polygon features — not MultiPolygon.
+        // The NB GeoJSON may be MultiPolygon (mainland + islands), so we find
+        // the largest polygon ring which represents the NB mainland.
+        let nbPoly = nb;
+        if (nb.geometry.type === 'MultiPolygon') {
+          let maxArea = 0, bestCoords = null;
+          nb.geometry.coordinates.forEach(coordSet => {
+            const candidate = turf.polygon(coordSet);
+            const area = turf.area(candidate);
+            if (area > maxArea) { maxArea = area; bestCoords = coordSet; }
+          });
+          nbPoly = turf.polygon(bestCoords);
+        }
+
+        // v6 API: turf.intersect(poly1, poly2)
+        const intersection = turf.intersect(nbPoly, box);
         if (intersection) {
           districtPoly = intersection;
         }
