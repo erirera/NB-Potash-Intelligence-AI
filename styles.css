@@ -219,3 +219,20 @@ body, html {
   0% { transform: scale(0.5); opacity: 0.6; }
   100% { transform: scale(1.5); opacity: 0; }
 }
+
+/* Opacity Row */
+.opacity-row {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 0 2px 18px; font-size: 0.72rem; color: var(--text-muted);
+}
+.opacity-label { white-space: nowrap; }
+#geology-opacity-val { white-space: nowrap; min-width: 30px; text-align: right; }
+
+/* WMS Feature Info Popup */
+.geology-popup .leaflet-popup-content-wrapper {
+  max-height: 280px; overflow-y: auto;
+}
+.geo-info-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; margin-top: 8px; }
+.geo-info-table td { padding: 4px 6px; border-bottom: 1px solid var(--panel-border); }
+.geo-info-table td:first-child { color: var(--text-muted); width: 45%; }
+.geo-info-table td:last-child { color: var(--text-main); font-weight: 500; }

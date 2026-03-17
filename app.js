@@ -56,12 +56,125 @@ map.on('mousemove', e => {
 
 // Layer Groups
 const layers = {
-  nb: L.layerGroup().addTo(map),
+  nb:       L.layerGroup().addTo(map),
   district: L.layerGroup().addTo(map),
-  extents: L.layerGroup().addTo(map),
-  cities: L.layerGroup().addTo(map),
+  extents:  L.layerGroup().addTo(map),
+  cities:   L.layerGroup().addTo(map),
   deposits: L.layerGroup().addTo(map)
 };
+
+/* ============================================================
+   NB BEDROCK GEOLOGY WMS
+   Source: GNB Dept. of Natural Resources & Energy Development
+   Service: OpenData_NBGS_Bedrock_Geology  |  Layer: 0
+   URL: https://gis-erd-der.gnb.ca/server/services/OpenData/
+          NBGS_Bedrock_Geology/MapServer/WMSServer
+   ============================================================ */
+const GEO_WMS_URL = 'https://gis-erd-der.gnb.ca/server/services/OpenData/NBGS_Bedrock_Geology/MapServer/WMSServer';
+
+const geologyWMS = L.tileLayer.wms(GEO_WMS_URL, {
+  layers:      '0',
+  format:      'image/png',
+  transparent: true,
+  version:     '1.3.0',
+  crs:         L.CRS.EPSG4326,
+  opacity:     0.60,
+  attribution: 'Bedrock Geology © GNB DNRED'
+});
+// NOT added to map by default — user toggles it on
+
+// --- Geology Toggle ---
+const geologyChk = document.getElementById('btn-geology');
+const geologyOpacityRow = document.getElementById('geology-opacity-row');
+const geologyOpacitySlider = document.getElementById('geology-opacity');
+const geologyOpacityVal = document.getElementById('geology-opacity-val');
+
+geologyChk.addEventListener('change', e => {
+  if (e.target.checked) {
+    geologyWMS.addTo(map);
+    geologyWMS.bringToBack();
+    geologyOpacityRow.style.display = 'flex';
+  } else {
+    map.removeLayer(geologyWMS);
+    geologyOpacityRow.style.display = 'none';
+  }
+});
+
+// --- Opacity Slider ---
+geologyOpacitySlider.addEventListener('input', e => {
+  const val = parseInt(e.target.value);
+  geologyOpacityVal.textContent = val + '%';
+  geologyWMS.setOpacity(val / 100);
+});
+
+// --- Click-to-Identify (GetFeatureInfo) ---
+let geoInfoPopup = null;
+
+map.on('click', e => {
+  if (!geologyChk.checked) return; // only when geology layer is on
+
+  const size   = map.getSize();
+  const bounds = map.getBounds();
+  const sw     = bounds.getSouthWest();
+  const ne     = bounds.getNorthEast();
+
+  // Build WMS GetFeatureInfo request
+  const params = new URLSearchParams({
+    SERVICE:      'WMS',
+    VERSION:      '1.3.0',
+    REQUEST:      'GetFeatureInfo',
+    LAYERS:       '0',
+    QUERY_LAYERS: '0',
+    FORMAT:       'image/png',
+    INFO_FORMAT:  'application/geo+json',
+    FEATURE_COUNT: '1',
+    CRS:          'EPSG:4326',
+    // EPSG:4326 axis order is lat,lon
+    BBOX:    `${sw.lat},${sw.lng},${ne.lat},${ne.lng}`,
+    WIDTH:   size.x,
+    HEIGHT:  size.y,
+    I: Math.round(e.containerPoint.x),
+    J: Math.round(e.containerPoint.y),
+  });
+
+  fetch(`${GEO_WMS_URL}?${params}`)
+    .then(r => r.json())
+    .then(data => {
+      if (!data.features || data.features.length === 0) return;
+      const props = data.features[0].properties;
+
+      // Build a tidy table from key properties
+      const fields = [
+        ['Formation', props.UNIT_CODE   || props.FormationName || '—'],
+        ['Group',     props.GROUP_CODE  || props.GroupName     || '—'],
+        ['Rock Type', props.ROCK_CLASS  || props.RockType      || '—'],
+        ['Age',       props.AGE_NAME    || props.Age           || '—'],
+        ['Legend',    props.BRIEF_LEGEND|| props.LegendDesc    || '—'],
+      ];
+
+      const rows = fields.map(([k, v]) =>
+        `<tr><td>${k}</td><td>${v}</td></tr>`
+      ).join('');
+
+      const html = `
+        <div class="popup-header" style="padding:10px 14px 8px;">
+          <div class="popup-name" style="font-size:0.85rem;">Bedrock Geology</div>
+          <div class="popup-sub">${e.latlng.lat.toFixed(4)}\u00b0N, ${Math.abs(e.latlng.lng).toFixed(4)}\u00b0W</div>
+        </div>
+        <div class="popup-body" style="padding:8px 14px 12px;">
+          <table class="geo-info-table">${rows}</table>
+        </div>`;
+
+      if (geoInfoPopup) geoInfoPopup.remove();
+      geoInfoPopup = L.popup({ className: 'geology-popup', maxWidth: 300, closeButton: true })
+        .setLatLng(e.latlng)
+        .setContent(html)
+        .openOn(map);
+    })
+    .catch(() => {/* silently ignore identify errors */});
+});
+
+
 
 // --- RENDER DATA ---
 

@@ -70,6 +70,13 @@
           <label class="toggle-btn"><input type="checkbox" id="btn-extents" checked> <span class="lbl-text"><span class="dash" style="border-color:#aaa"></span> Deposit Extents</span></label>
           <label class="toggle-btn"><input type="checkbox" id="btn-cities" checked> <span class="lbl-text"><span class="dot" style="background:var(--city)"></span> Cities</span></label>
           <label class="toggle-btn"><input type="checkbox" id="btn-district" checked> <span class="lbl-text"><span class="rect" style="border-color:var(--district)"></span> Potash District</span></label>
+          <div style="height:1px;background:rgba(255,255,255,0.08);margin:4px 0;"></div>
+          <label class="toggle-btn"><input type="checkbox" id="btn-geology"> <span class="lbl-text"><span class="dot" style="background:#a8d8a8"></span> Bedrock Geology</span></label>
+          <div class="opacity-row" id="geology-opacity-row" style="display:none;">
+            <span class="opacity-label">Opacity</span>
+            <input type="range" id="geology-opacity" min="10" max="100" value="60" style="flex:1;accent-color:var(--accent);">
+            <span id="geology-opacity-val">60%</span>
+          </div>
           <label class="toggle-btn"><input type="checkbox" id="btn-nb" checked> <span class="lbl-text"><span class="line" style="background:var(--nb-blue)"></span> NB Boundary</span></label>
         </div>
         <div class="action-buttons">
