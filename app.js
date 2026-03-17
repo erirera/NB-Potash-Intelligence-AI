@@ -38,7 +38,7 @@ const EXTENTS = [
   { name: "Millstream Deposit", color: "#3fb950", cx: 45.7028, cy: -65.6311, aMaj: 3.6, aMin: 1.8, rot: 40, lbl: "~20 km\u00b2 \u2022 Evaporite extent" }
 ];
 
-const RECT_BOUNDS = [[45.15, -66.30], [46.20, -64.30]];
+const RECT_BOUNDS = [[45.15, -65.96], [46.03, -64.30]];
 const INITIAL_BOUNDS = L.latLngBounds(RECT_BOUNDS).pad(0.05);
 
 // --- INIT MAP ---
@@ -246,8 +246,8 @@ fetch('https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/p
       document.getElementById('nb-loading').remove();
 
       // Intersect District Box with NB Boundary using Turf.js
-      // RECT_BOUNDS = [[45.15, -66.30], [46.20, -64.30]] -> [minX, minY, maxX, maxY]
-      const minLng = -66.30, minLat = 45.15, maxLng = -64.30, maxLat = 46.20;
+      // RECT_BOUNDS = [[45.15, -65.96], [46.03, -64.30]] -> [minX, minY, maxX, maxY]
+      const minLng = -65.96, minLat = 45.15, maxLng = -64.30, maxLat = 46.03;
       const box = turf.bboxPolygon([minLng, minLat, maxLng, maxLat]);
       let districtPoly = box;
 

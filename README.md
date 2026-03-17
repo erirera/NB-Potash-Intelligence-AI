@@ -37,7 +37,7 @@ Dashed ellipses scaled to documented geological dimensions:
 Moncton · Saint John · Fredericton · Sussex · Hampton · Petitcodiac
 
 ### Potash District Boundary
-An amber polygon representing the **Windsor Group evaporite belt** (~175 × 117 km). The eastern and south-eastern boundary is **clipped to the provincial outline** using **Turf.js** polygon intersection — conforming to the coastline of the Bay of Fundy and Northumberland Strait.
+An amber polygon representing the **Windsor Group evaporite belt** (~140 × 100 km). The eastern and south-eastern boundary is **clipped to the provincial outline** using **Turf.js** polygon intersection — conforming to the coastline of the Bay of Fundy and Northumberland Strait.
 
 ### NB Provincial Boundary
 Fetched at runtime from a public GeoJSON source and rendered as a reference layer.
